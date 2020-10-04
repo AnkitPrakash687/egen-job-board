@@ -1,5 +1,7 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
+// eslint-disable-next-line no-unused-vars
+import colors from 'vuetify/lib/util/colors'
 
 Vue.use(Vuetify);
 
