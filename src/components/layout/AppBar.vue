@@ -1,28 +1,25 @@
 <template>
-  <v-app-bar
-      app
-      color="primary"
-      dark
-      class="pr-sm-16 pl-sm-16 pb-sm-16 pr-xs-0 pl-xs-0 rounded-bl-xl"
-      height="100"
-      absolute
-    >
-      <div class="d-flex">
-        <div class="text-weight-bold text-h6">devJobs</div>
-      </div>
+  <div app color="primary" dark height="100" class="ma-0 appbar">
+    <v-container>
+      <v-row>
+        <div class="d-flex">
+          <div class="text-weight-bold text-h6">devJobs</div>
+        </div>
 
-      <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
 
-      <v-switch
-        :input-value="darkMode"
-        inset
-        :ripple="false"
-        color="accent"
-        dense
-        @change="toggleTheme()"
-      >
-      </v-switch>
-    </v-app-bar>
+        <v-switch
+          :input-value="darkMode"
+          inset
+          :ripple="false"
+          color="accent"
+          dense
+          @change="toggleTheme()"
+        >
+        </v-switch>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -37,9 +34,12 @@ export default {
       this.$vuetify.theme.dark = this.darkMode;
     },
   },
-}
+};
 </script>
 
 <style>
-
+.appbar {
+  background-color: var(--v-primary-base);
+  border-bottom-left-radius: 60px;
+}
 </style>
