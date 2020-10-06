@@ -35,7 +35,7 @@
                 width="280"
                 height="200"
                 class="mt-4 rounded-lg"
-                @click="clickJob(pos)"
+                @click="clickJob(pos.id)"
               >
                 <v-row class="ml-4 mb-1 pt-8">
                   <span class="text-caption grey--text mr-1">
@@ -84,8 +84,7 @@
 
 <script>
 import Toolbar from '@/components/Toolbar';
-import jobapidata from '@/data/jobapidata.js';
-import { getAgoDuration } from '@/utils/common.js';
+import { mapData, removeDuplicate } from '@/utils/common.js';
 import { fetchJobs, searchJobs } from '@/services/services.js';
 export default {
   components: {
@@ -109,24 +108,17 @@ export default {
       .then((data) => {
         this.loading = false;
         console.log('apidata', data);
-        this.positions = data.map((job) => {
-          let ago = getAgoDuration(job.created_at);
-          return { ...job, ago: ago + ' ago' };
-        });
+        this.positions = mapData(data)
       })
-      .catch((e) => {
+      .catch(e => {
+        console.log(e)
         this.loading = false;
-        console.log('error', e);
-        this.positions = jobapidata.map((job) => {
-          let ago = getAgoDuration(job.created_at);
-          return { ...job, ago: ago + ' ago' };
-        });
       });
   },
   methods: {
-    clickJob(pos) {
-      console.log(pos);
-      this.$router.push({ name: 'job', params: { pos: pos } });
+    clickJob(id) {
+      console.log(id);
+      this.$router.push({ path: `job/${id}` });
     },
     loadMore() {
       let pageNumber = ++this.pageCount;
@@ -137,13 +129,8 @@ export default {
           .then((data) => {
             this.loading = false;
             if (data.length > 0) {
-              data = data.map((job) => {
-                let ago = getAgoDuration(job.created_at);
-                return { ...job, ago: ago + ' ago' };
-              });
-              this.positions = [...this.position, ...data].filter(
-                (v, i, a) => a.findIndex((t) => t.id === v.id) === i
-              );
+              data = mapData(data)
+              this.positions = removeDuplicate([...this.position, ...data])
             } else {
               this.loadingText = 'No More Jobs';
             }
@@ -158,13 +145,8 @@ export default {
         .then((data) => {
           console.log(pageNumber, data);
           if (data.length > 0) {
-            data = data.map((job) => {
-              let ago = getAgoDuration(job.created_at);
-              return { ...job, ago: ago + ' ago' };
-            });
-            this.positions = [...this.positions, ...data].filter(
-              (v, i, a) => a.findIndex((t) => t.id === v.id) === i
-            );
+            data = mapData(data)
+            this.positions = removeDuplicate([...this.positions, ...data])
           } else {
             this.loadingText = 'No More Jobs';
           }
@@ -182,10 +164,7 @@ export default {
         .then((res) => res.json())
         .then((data) => {
           if (data.length > 0) {
-            data = data.map((job) => {
-              let ago = getAgoDuration(job.created_at);
-              return { ...job, ago: ago + ' ago' };
-            });
+            data = mapData(data)
             this.positions = data;
           }
         });

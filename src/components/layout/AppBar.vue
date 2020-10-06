@@ -6,14 +6,14 @@
     class="ma-0 bg-primary bottom-left-rounded-sm app-bar-height"
   >
     <v-container class="app-con pa-0">
-      <v-row>
-        <v-col class="mt-2">
+      <v-row class="pa-0 mr-0">
+        <v-col class="mt-2 ml-2">
           <v-row justify="center">
             <div class="text-weight-bold text-h5 secondary--text">devJobs</div>
           </v-row>
         </v-col>
         <v-spacer></v-spacer>
-        <v-col>
+        <v-col class="mr-4">
           <v-row justify="center">
 
             <v-icon size="14" color="secondary" class="mr-4 mt-6">{{lightIcon}}</v-icon>
@@ -62,7 +62,7 @@ export default {
 }
 
 .app-con {
-  max-width: 1200px !important;
+  max-width: 1050px !important;
 }
 @media only screen and (min-width: 600px) {
   .bottom-left-rounded-sm {

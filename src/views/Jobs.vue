@@ -1,8 +1,29 @@
 <template>
   <v-container class="job-container">
-    <v-sheet height="130" rounded class="mt-n12 d-none d-lg-block">
+    <v-row  v-if="loading" justify="center" class="mt-16"> 
+      <v-progress-circular
+        v-if="loading"
+        :size="70"
+        :width="7"
+        color="primary"
+        indeterminate
+      >
+      </v-progress-circular>
+  
+    </v-row>
+    <v-sheet
+      v-if="!loading"
+      height="130"
+      rounded
+      class="mt-n12 d-none d-sm-block"
+    >
       <v-row>
-        <v-card width="130" height="130" class="elevation-0">
+        <v-card
+          :loading="loading"
+          width="130"
+          height="130"
+          class="elevation-0 ml-2"
+        >
           <img width="130" height="130" :src="position.company_logo" />
         </v-card>
         <v-row class="ml-sm-8 mt-sm-8">
@@ -30,7 +51,8 @@
         </v-row>
       </v-row>
     </v-sheet>
-    <v-sheet class="pa-sm-8 mt-8">
+
+    <v-sheet v-if="!loading" class="pa-sm-8 mt-8">
       <v-row>
         <v-col sm="8" cols="12">
           <v-row class="ml-4 mb-1 pt-4">
@@ -38,9 +60,9 @@
               {{ position.ago }}
             </span>
             <span class="text-caption grey--text"> &#x2022; </span>
-            <span class="text-caption grey--text ml-1">{{
-              position.type
-            }}</span>
+            <span class="text-caption grey--text ml-1">
+              {{ position.type }}</span
+            >
           </v-row>
           <v-row class="ml-4 mb-1">
             <span class="text-h5 font-weight-bold">{{ position.title }} </span>
@@ -66,11 +88,11 @@
       </v-row>
       <v-row class="ml-2 mr-2">
         <v-col cols="12">
-        <span v-html="position.description"></span>
+          <span v-html="position.description"></span>
         </v-col>
       </v-row>
     </v-sheet>
-    <v-sheet color="primary" class="pa-16 mt-4 rounded-lg">
+    <v-sheet v-if="!loading" color="primary" class="pa-16 mt-4 rounded-lg">
       <v-row class="secondary--text font-weight-bold text-body-1">
         How to Apply
       </v-row>
@@ -85,17 +107,31 @@
 </template>
 
 <script>
+import { fetchJobById } from '@/services/services.js';
+import { getAgoDuration } from '@/utils/common.js';
 export default {
   data() {
-    return { position: null };
+    return { position: {}, loading: true };
   },
-  created() {
-    this.position = this.$route.params.pos;
-    if (!this.position) {
-      this.$router.push({ name: 'home' });
-    } else {
-      console.log('position', this.position);
-    }
+  mounted() {
+    // this.position = this.$route.params.id;
+    let id = this.$route.params.id;
+    console.log(id);
+    this.loading = true;
+    fetchJobById(id)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data) {
+          let ago = getAgoDuration(data.created_at);
+          this.position = { ...data, ago: ago + ' ago' };
+        }
+        this.loading = false;
+      })
+      .catch((e) => {
+        console.log(e);
+        this.loading = false;
+      });
   },
 };
 </script>
@@ -109,7 +145,7 @@ p > a {
   font-weight: bold;
 }
 
-.desc{
-  
+.absolute {
+  position: absolute;
 }
 </style>
