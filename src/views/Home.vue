@@ -9,8 +9,18 @@
     />
 
     <v-main class="main">
+      <v-row justify="center">
+      <v-progress-circular
+      v-if="loading"
+           :size="70"
+      :width="7"
+      color="purple"
+      indeterminate
+      >
+      </v-progress-circular>
+      </v-row>
       <v-container class="con">
-        <v-row justify="center">
+        <v-row justify="center"  v-if="!loading">
           <v-col
             sm="4"
             xs="12"
@@ -51,7 +61,7 @@
                     >{{ pos.title }}
                   </span>
                 </v-row>
-                <v-row class="ml-4 mb-8">
+                <v-row class="ml-4 mb-16">
                   <span class="text-caption grey--text">
                     {{ pos.company }}
                   </span>
@@ -71,7 +81,8 @@
             large
             @click="loadMore"
             class="my-4"
-            :loading="loading"
+            :disabled="loadingText=='No More Jobs'?true:false"
+           v-if="!loading"
           >
             {{ loadingText }}</v-btn
           >
@@ -160,6 +171,7 @@ export default {
     search() {
       this.pageCount = 1;
       this.loadingText = 'Load more';
+      this.loading = true;
       searchJobs(this.location, this.title, this.pageCount)
         .then((res) => res.json())
         .then((data) => {
@@ -167,7 +179,9 @@ export default {
             data = mapData(data)
             this.positions = data;
           }
+              this.loading = false;
         });
+    
     },
     toggleFullTime() {
       this.fullTimeChecked = !this.fullTimeChecked;

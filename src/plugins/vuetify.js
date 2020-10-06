@@ -1,11 +1,17 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
-// eslint-disable-next-line no-unused-vars
-import colors from 'vuetify/lib/util/colors'
-
+import { mdiMagnify } from '@mdi/js';
+import { mdiMapMarker } from '@mdi/js';
 Vue.use(Vuetify);
 
+const MY_ICONS = {
+  search: mdiMagnify,
+  location: mdiMapMarker
+}
 export default new Vuetify({
+  icons:{
+    values: MY_ICONS,
+  },
     theme: {
       options: { customProperties: true },
         themes: {

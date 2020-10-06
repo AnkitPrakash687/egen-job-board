@@ -52,6 +52,29 @@
       </v-row>
     </v-sheet>
 
+<v-sheet height="200" class="hidden-sm-and-up mt-n8 rounded-lg" v-if="!loading">
+  <v-row justify="center">
+    <v-card height="50" width="50" class="mt-n4">
+      <v-img height="50" width="50" :src="position.company_logo"> </v-img>
+    </v-card>
+     </v-row>
+       <div class="text-center font-weight-bold text-h6 my-4">{{position.company}}
+    </div>
+    <v-row justify="center" class="mt-10">
+         <v-btn
+                color="primary"
+                large
+                text
+                class="text-capitalize secondary font-weight-bold"
+                ><a
+                  :href="position.company_url"
+                  target="_blank"
+                  class="text-decoration-none"
+                  >Company Site</a
+                ></v-btn
+              > 
+    </v-row>
+</v-sheet>
     <v-sheet v-if="!loading" class="pa-sm-8 mt-8">
       <v-row>
         <v-col sm="8" cols="12">
