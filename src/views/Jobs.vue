@@ -139,12 +139,12 @@ export default {
   mounted() {
     // this.position = this.$route.params.id;
     let id = this.$route.params.id;
-    console.log(id);
+    //console.log(id);
     this.loading = true;
     fetchJobById(id)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        //console.log(data);
         if (data) {
           let ago = getAgoDuration(data.created_at);
           this.position = { ...data, ago: ago + ' ago' };

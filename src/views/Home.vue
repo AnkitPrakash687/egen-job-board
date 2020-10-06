@@ -118,7 +118,7 @@ export default {
       .then((res) => res.json())
       .then((data) => {
         this.loading = false;
-        console.log('apidata', data);
+       // console.log('apidata', data);
         this.positions = mapData(data)
       })
       .catch(e => {
@@ -128,7 +128,7 @@ export default {
   },
   methods: {
     clickJob(id) {
-      console.log(id);
+     // console.log(id);
       this.$router.push({ path: `job/${id}` });
     },
     loadMore() {
@@ -154,7 +154,7 @@ export default {
       fetchJobs(pageNumber)
         .then((res) => res.json())
         .then((data) => {
-          console.log(pageNumber, data);
+         // console.log(pageNumber, data);
           if (data.length > 0) {
             data = mapData(data)
             this.positions = removeDuplicate([...this.positions, ...data])
@@ -185,7 +185,7 @@ export default {
     },
     toggleFullTime() {
       this.fullTimeChecked = !this.fullTimeChecked;
-      console.log(this.fullTimeChecked);
+     // console.log(this.fullTimeChecked);
     },
     inputTitle(newValue) {
       this.title = newValue;

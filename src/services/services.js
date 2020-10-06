@@ -16,7 +16,7 @@ export const searchJobs = (location, title, pageNumber) =>{
         query = `location=${location}&search=${title}`
     }
     query = query + `&page=${pageNumber}`
-    console.log(query)
+    //console.log(query)
     return fetch(
         `${BASE_URL}/positions.json?${query}`
     )
