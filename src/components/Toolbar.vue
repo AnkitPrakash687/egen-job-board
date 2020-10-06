@@ -11,6 +11,7 @@
                 flat
                 height="40px"
                 label="Filter by title, componies, expertise..."
+                @input="inputTitle"
               >
               </v-text-field>
             </v-col>
@@ -23,6 +24,7 @@
                 full-width
                 flat
                 label="Filter by location"
+                @input="inputLocation"
               >
               </v-text-field>
             </v-col>
@@ -32,11 +34,11 @@
                 <v-col cols="12" class="pa-0 pl-2">
                   <v-row justify="center">
                     <v-col cols="6" class="pb-0 pt-0">
-                      <v-checkbox label="Full Time Only" :ripple="false">
+                      <v-checkbox label="Full Time Only" :input-value="fullTimeChecked" :ripple="false" @click="$emit('click:fullTimeCheckbox')">
                       </v-checkbox>
                     </v-col>
                     <v-col cols="4" class="pa-0 pt-2">
-                      <v-btn color="primary" large>Search </v-btn>
+                      <v-btn color="primary" large @click="$emit('click:search')">Search </v-btn>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -50,7 +52,25 @@
 
 <script>
 export default {
-
+  props:{
+    fullTimeChecked: {
+      type: Boolean,
+      default: false
+    }
+  },
+data(){
+  return{
+    fullTimeValue: false
+  }
+},
+methods:{
+  inputTitle(newValue){
+    this.$emit('input:title', newValue)
+  },
+  inputLocation(newValue){
+    this.$emit('input:location', newValue)
+  }
+}
 }
 </script>
 

@@ -1,6 +1,12 @@
 <template>
   <div>
-    <e-toolbar />
+    <e-toolbar
+      :fullTimeChecked="fullTimeChecked"
+      @click:fullTimeCheckbox="toggleFullTime"
+      @click:search="search"
+      @input:title="inputTitle"
+      @input:location="inputLocation"
+    />
 
     <v-main class="main">
       <v-container class="con">
@@ -9,7 +15,7 @@
             sm="4"
             xs="12"
             class="mb-2"
-            v-for="pos in positions"
+            v-for="pos in filteredPositions"
             :key="pos.id"
           >
             <v-row justify="center">
@@ -59,15 +65,28 @@
             </v-row>
           </v-col>
         </v-row>
+        <v-row justify="center">
+          <v-btn
+            color="primary"
+            large
+            @click="loadMore"
+            class="my-4"
+            :loading="loading"
+          >
+            {{ loadingText }}</v-btn
+          >
+        </v-row>
+        <v-row> </v-row>
       </v-container>
     </v-main>
   </div>
 </template>
 
 <script>
-import Toolbar from "@/components/Toolbar";
-import jobapidata from "@/data/jobapidata.js";
-import {getAgoDuration} from "@/utils/common.js"
+import Toolbar from '@/components/Toolbar';
+import jobapidata from '@/data/jobapidata.js';
+import { getAgoDuration } from '@/utils/common.js';
+import { fetchJobs, searchJobs } from '@/services/services.js';
 export default {
   components: {
     EToolbar: Toolbar,
@@ -75,32 +94,122 @@ export default {
   data() {
     return {
       positions: [],
+      pageCount: 1,
+      loading: true,
+      loadingText: 'Load More',
+      fullTimeChecked: false,
+      location: '',
+      title: '',
     };
   },
   mounted() {
-    fetch(
-      "https://jobs.github.com/positions.json"
-    )
+    this.loading = true;
+    fetchJobs(1)
       .then((res) => res.json())
       .then((data) => {
-        console.log('apidata',data);
-          this.positions = data.map((job) => {
-          let ago = getAgoDuration(job.created_at)
+        this.loading = false;
+        console.log('apidata', data);
+        this.positions = data.map((job) => {
+          let ago = getAgoDuration(job.created_at);
           return { ...job, ago: ago + ' ago' };
         });
       })
-      .catch(e =>{
-        console.log('error', e)
-          this.positions = jobapidata.map((job) => {
-          let ago = getAgoDuration(job.created_at)
+      .catch((e) => {
+        this.loading = false;
+        console.log('error', e);
+        this.positions = jobapidata.map((job) => {
+          let ago = getAgoDuration(job.created_at);
           return { ...job, ago: ago + ' ago' };
         });
-      })
+      });
   },
   methods: {
     clickJob(pos) {
       console.log(pos);
-      this.$router.push({ name: "job", params: { pos: pos } });
+      this.$router.push({ name: 'job', params: { pos: pos } });
+    },
+    loadMore() {
+      let pageNumber = ++this.pageCount;
+      this.loading = true;
+      if (this.location || this.title) {
+        searchJobs(this.location, this.title, this.pageCount)
+          .then((res) => res.json())
+          .then((data) => {
+            this.loading = false;
+            if (data.length > 0) {
+              data = data.map((job) => {
+                let ago = getAgoDuration(job.created_at);
+                return { ...job, ago: ago + ' ago' };
+              });
+              this.positions = [...this.position, ...data].filter(
+                (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+              );
+            } else {
+              this.loadingText = 'No More Jobs';
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+            this.loading = false;
+          });
+      }
+      fetchJobs(pageNumber)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(pageNumber, data);
+          if (data.length > 0) {
+            data = data.map((job) => {
+              let ago = getAgoDuration(job.created_at);
+              return { ...job, ago: ago + ' ago' };
+            });
+            this.positions = [...this.positions, ...data].filter(
+              (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+            );
+          } else {
+            this.loadingText = 'No More Jobs';
+          }
+          this.loading = false;
+        })
+        .catch((e) => {
+          this.loading = false;
+          console.log(e);
+        });
+    },
+    search() {
+      this.pageCount = 1;
+      this.loadingText = 'Load more';
+      searchJobs(this.location, this.title, this.pageCount)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.length > 0) {
+            data = data.map((job) => {
+              let ago = getAgoDuration(job.created_at);
+              return { ...job, ago: ago + ' ago' };
+            });
+            this.positions = data;
+          }
+        });
+    },
+    toggleFullTime() {
+      this.fullTimeChecked = !this.fullTimeChecked;
+      console.log(this.fullTimeChecked);
+    },
+    inputTitle(newValue) {
+      this.title = newValue;
+    },
+    inputLocation(newValue) {
+      this.location = newValue;
+    },
+  },
+  computed: {
+    filteredPositions() {
+      if (this.fullTimeChecked) {
+        return this.positions.filter((pos) => {
+          if (pos.type === 'Full Time') return true;
+          return false;
+        });
+      }
+      return this.positions;
     },
   },
 };
