@@ -8,7 +8,8 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: Home
+    component: Home,
+    alias: '/position'
   },
    {
       name:'job',
