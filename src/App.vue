@@ -25,6 +25,7 @@ export default {
 .v-application{
  background: var(--v-secondary-base) !important;
 }
+
 </style>
 
 

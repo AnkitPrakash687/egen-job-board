@@ -9,8 +9,18 @@
     />
 
     <v-main class="main">
+      <v-row justify="center">
+      <v-progress-circular
+      v-if="loading"
+           :size="70"
+      :width="7"
+      color="purple"
+      indeterminate
+      >
+      </v-progress-circular>
+      </v-row>
       <v-container class="con">
-        <v-row justify="center">
+        <v-row justify="center"  v-if="!loading">
           <v-col
             sm="4"
             xs="12"
@@ -35,7 +45,7 @@
                 width="280"
                 height="200"
                 class="mt-4 rounded-lg"
-                @click="clickJob(pos)"
+                @click="clickJob(pos.id)"
               >
                 <v-row class="ml-4 mb-1 pt-8">
                   <span class="text-caption grey--text mr-1">
@@ -51,7 +61,7 @@
                     >{{ pos.title }}
                   </span>
                 </v-row>
-                <v-row class="ml-4 mb-8">
+                <v-row class="ml-4 mb-16">
                   <span class="text-caption grey--text">
                     {{ pos.company }}
                   </span>
@@ -71,7 +81,8 @@
             large
             @click="loadMore"
             class="my-4"
-            :loading="loading"
+            :disabled="loadingText=='No More Jobs'?true:false"
+           v-if="!loading"
           >
             {{ loadingText }}</v-btn
           >
@@ -84,8 +95,7 @@
 
 <script>
 import Toolbar from '@/components/Toolbar';
-import jobapidata from '@/data/jobapidata.js';
-import { getAgoDuration } from '@/utils/common.js';
+import { mapData, removeDuplicate } from '@/utils/common.js';
 import { fetchJobs, searchJobs } from '@/services/services.js';
 export default {
   components: {
@@ -108,25 +118,18 @@ export default {
       .then((res) => res.json())
       .then((data) => {
         this.loading = false;
-        console.log('apidata', data);
-        this.positions = data.map((job) => {
-          let ago = getAgoDuration(job.created_at);
-          return { ...job, ago: ago + ' ago' };
-        });
+       // console.log('apidata', data);
+        this.positions = mapData(data)
       })
-      .catch((e) => {
+      .catch(e => {
+        console.log(e)
         this.loading = false;
-        console.log('error', e);
-        this.positions = jobapidata.map((job) => {
-          let ago = getAgoDuration(job.created_at);
-          return { ...job, ago: ago + ' ago' };
-        });
       });
   },
   methods: {
-    clickJob(pos) {
-      console.log(pos);
-      this.$router.push({ name: 'job', params: { pos: pos } });
+    clickJob(id) {
+     // console.log(id);
+      this.$router.push({ path: `job/${id}` });
     },
     loadMore() {
       let pageNumber = ++this.pageCount;
@@ -137,13 +140,8 @@ export default {
           .then((data) => {
             this.loading = false;
             if (data.length > 0) {
-              data = data.map((job) => {
-                let ago = getAgoDuration(job.created_at);
-                return { ...job, ago: ago + ' ago' };
-              });
-              this.positions = [...this.position, ...data].filter(
-                (v, i, a) => a.findIndex((t) => t.id === v.id) === i
-              );
+              data = mapData(data)
+              this.positions = removeDuplicate([...this.position, ...data])
             } else {
               this.loadingText = 'No More Jobs';
             }
@@ -156,15 +154,10 @@ export default {
       fetchJobs(pageNumber)
         .then((res) => res.json())
         .then((data) => {
-          console.log(pageNumber, data);
+         // console.log(pageNumber, data);
           if (data.length > 0) {
-            data = data.map((job) => {
-              let ago = getAgoDuration(job.created_at);
-              return { ...job, ago: ago + ' ago' };
-            });
-            this.positions = [...this.positions, ...data].filter(
-              (v, i, a) => a.findIndex((t) => t.id === v.id) === i
-            );
+            data = mapData(data)
+            this.positions = removeDuplicate([...this.positions, ...data])
           } else {
             this.loadingText = 'No More Jobs';
           }
@@ -178,21 +171,21 @@ export default {
     search() {
       this.pageCount = 1;
       this.loadingText = 'Load more';
+      this.loading = true;
       searchJobs(this.location, this.title, this.pageCount)
         .then((res) => res.json())
         .then((data) => {
           if (data.length > 0) {
-            data = data.map((job) => {
-              let ago = getAgoDuration(job.created_at);
-              return { ...job, ago: ago + ' ago' };
-            });
+            data = mapData(data)
             this.positions = data;
           }
+              this.loading = false;
         });
+    
     },
     toggleFullTime() {
       this.fullTimeChecked = !this.fullTimeChecked;
-      console.log(this.fullTimeChecked);
+     // console.log(this.fullTimeChecked);
     },
     inputTitle(newValue) {
       this.title = newValue;
