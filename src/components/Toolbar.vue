@@ -1,5 +1,6 @@
 <template>
-  <v-row class="toolbar">
+<v-container>
+  <v-row justify="center" class="toolbar ma-0 mt-n7">
         <v-sheet style="width: 70vw; height: auto" rounded elevation="4">
           <v-row>
             <v-col sm="4" xs="12" class="pa-0 pt-sm-2 pb-sm-2 pl-4 pr-4">
@@ -44,6 +45,7 @@
           </v-row>
         </v-sheet>
       </v-row>
+      </v-container>
 </template>
 
 <script>
@@ -54,9 +56,9 @@ export default {
 
 <style scoped>
 .toolbar {
-  position: absolute;
+  margin-top: -20px;
   z-index: 1000;
-  top: 7%;
+  bottom: 0;
 }
 
 .vertical-divider {

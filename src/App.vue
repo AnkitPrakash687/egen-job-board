@@ -1,5 +1,5 @@
 <template>
-  <v-app class="app">
+  <v-app  >
     <e-app-bar />
        <router-view />
   </v-app>
@@ -21,5 +21,10 @@ export default {
 
 };
 </script>
+<style >
+.v-application{
+ background: var(--v-secondary-base) !important;
+}
+</style>
 
 
